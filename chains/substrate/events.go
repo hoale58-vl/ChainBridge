@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"math/big"
 
-	events "github.com/ChainSafe/chainbridge-substrate-events"
+	utils "github.com/ChainSafe/ChainBridge/shared/substrate"
 	"github.com/ChainSafe/chainbridge-utils/msg"
 	"github.com/ChainSafe/log15"
 )
@@ -29,7 +29,7 @@ var Subscriptions = []struct {
 }
 
 func fungibleTransferHandler(evtI interface{}, log log15.Logger) (msg.Message, error) {
-	evt, ok := evtI.(events.EventFungibleTransfer)
+	evt, ok := evtI.(utils.EventFungibleTransfer)
 	if !ok {
 		return msg.Message{}, fmt.Errorf("failed to cast EventFungibleTransfer type")
 	}
@@ -48,7 +48,7 @@ func fungibleTransferHandler(evtI interface{}, log log15.Logger) (msg.Message, e
 }
 
 func nonFungibleTransferHandler(evtI interface{}, log log15.Logger) (msg.Message, error) {
-	evt, ok := evtI.(events.EventNonFungibleTransfer)
+	evt, ok := evtI.(utils.EventNonFungibleTransfer)
 	if !ok {
 		return msg.Message{}, fmt.Errorf("failed to cast EventNonFungibleTransfer type")
 	}
@@ -67,7 +67,7 @@ func nonFungibleTransferHandler(evtI interface{}, log log15.Logger) (msg.Message
 }
 
 func genericTransferHandler(evtI interface{}, log log15.Logger) (msg.Message, error) {
-	evt, ok := evtI.(events.EventGenericTransfer)
+	evt, ok := evtI.(utils.EventGenericTransfer)
 	if !ok {
 		return msg.Message{}, fmt.Errorf("failed to cast EventGenericTransfer type")
 	}

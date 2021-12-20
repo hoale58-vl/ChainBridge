@@ -30,7 +30,7 @@ var ErrFatalQuery = errors.New("query of chain state failed")
 
 // proposalIsComplete returns true if the proposal state is either Passed, Transferred or Cancelled
 func (w *writer) proposalIsComplete(srcId msg.ChainId, nonce msg.Nonce, dataHash [32]byte) bool {
-	prop, err := w.bridgeContract.GetProposal(w.conn.CallOpts(), uint8(srcId), uint64(nonce), dataHash)
+	prop, err := w.bridgeContract.GetProposal(w.conn.CallOpts(), uint64(srcId), uint64(nonce), dataHash)
 	if err != nil {
 		w.log.Error("Failed to check proposal existence", "err", err)
 		return false
@@ -40,7 +40,7 @@ func (w *writer) proposalIsComplete(srcId msg.ChainId, nonce msg.Nonce, dataHash
 
 // proposalIsComplete returns true if the proposal state is Transferred or Cancelled
 func (w *writer) proposalIsFinalized(srcId msg.ChainId, nonce msg.Nonce, dataHash [32]byte) bool {
-	prop, err := w.bridgeContract.GetProposal(w.conn.CallOpts(), uint8(srcId), uint64(nonce), dataHash)
+	prop, err := w.bridgeContract.GetProposal(w.conn.CallOpts(), uint64(srcId), uint64(nonce), dataHash)
 	if err != nil {
 		w.log.Error("Failed to check proposal existence", "err", err)
 		return false
@@ -49,7 +49,7 @@ func (w *writer) proposalIsFinalized(srcId msg.ChainId, nonce msg.Nonce, dataHas
 }
 
 func (w *writer) proposalIsPassed(srcId msg.ChainId, nonce msg.Nonce, dataHash [32]byte) bool {
-	prop, err := w.bridgeContract.GetProposal(w.conn.CallOpts(), uint8(srcId), uint64(nonce), dataHash)
+	prop, err := w.bridgeContract.GetProposal(w.conn.CallOpts(), uint64(srcId), uint64(nonce), dataHash)
 	if err != nil {
 		w.log.Error("Failed to check proposal existence", "err", err)
 		return false
@@ -263,7 +263,7 @@ func (w *writer) voteProposal(m msg.Message, dataHash [32]byte) {
 
 			tx, err := w.bridgeContract.VoteProposal(
 				w.conn.Opts(),
-				uint8(m.Source),
+				uint64(m.Source),
 				uint64(m.DepositNonce),
 				m.ResourceId,
 				dataHash,
@@ -314,7 +314,7 @@ func (w *writer) executeProposal(m msg.Message, data []byte, dataHash [32]byte) 
 
 			tx, err := w.bridgeContract.ExecuteProposal(
 				w.conn.Opts(),
-				uint8(m.Source),
+				uint64(m.Source),
 				uint64(m.DepositNonce),
 				data,
 				m.ResourceId,

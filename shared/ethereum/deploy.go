@@ -36,7 +36,7 @@ type DeployedContracts struct {
 }
 
 // DeployContracts deploys Bridge, Relayer, ERC20Handler, ERC721Handler and CentrifugeAssetHandler and returns the addresses
-func DeployContracts(client *Client, chainID uint8, initialRelayerThreshold *big.Int) (*DeployedContracts, error) {
+func DeployContracts(client *Client, chainID uint64, initialRelayerThreshold *big.Int) (*DeployedContracts, error) {
 	bridgeAddr, err := deployBridge(client, chainID, RelayerAddresses, initialRelayerThreshold)
 	if err != nil {
 		return nil, err
@@ -74,7 +74,7 @@ func UpdateNonce(client *Client) error {
 	return nil
 }
 
-func deployBridge(client *Client, chainID uint8, relayerAddrs []common.Address, initialRelayerThreshold *big.Int) (common.Address, error) {
+func deployBridge(client *Client, chainID uint64, relayerAddrs []common.Address, initialRelayerThreshold *big.Int) (common.Address, error) {
 	err := client.LockNonceAndUpdate()
 	if err != nil {
 		return ZeroAddress, err
