@@ -136,13 +136,11 @@ func InitializeChain(chainCfg *core.ChainConfig, logger log15.Logger, sysErr cha
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println("d")
 
 	chainId, err := bridgeContract.ChainID(conn.CallOpts())
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println("d2")
 
 	if chainId != uint64(chainCfg.Id) {
 		return nil, fmt.Errorf("chainId (%d) and configuration chainId (%d) do not match", chainId, chainCfg.Id)

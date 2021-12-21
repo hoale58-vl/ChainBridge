@@ -166,13 +166,16 @@ func (l *listener) getDepositEventsForBlock(latestBlock *big.Int) error {
 	if err != nil {
 		return fmt.Errorf("unable to Filter Logs: %w", err)
 	}
-
 	// read through the log events and handle their deposit event if handler is recognized
 	for _, log := range logs {
 		var m msg.Message
 		destId := msg.ChainId(log.Topics[1].Big().Uint64())
 		rId := msg.ResourceIdFromSlice(log.Topics[2].Bytes())
 		nonce := msg.Nonce(log.Topics[3].Big().Uint64())
+
+		// destId := msg.ChainId(binary.BigEndian.Uint64(log.Data[24:32]))
+		// rId := msg.ResourceIdFromSlice(log.Data[32:64])
+		// nonce := msg.Nonce(binary.BigEndian.Uint64(log.Data[88:96]))
 
 		addr, err := l.bridgeContract.ResourceIDToHandlerAddress(&bind.CallOpts{From: l.conn.Keypair().CommonAddress()}, rId)
 		if err != nil {

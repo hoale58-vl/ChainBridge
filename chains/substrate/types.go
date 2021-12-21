@@ -5,6 +5,7 @@ package substrate
 
 import (
 	"math/big"
+	"strings"
 
 	"github.com/ChainSafe/chainbridge-utils/msg"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
@@ -69,6 +70,8 @@ func (w *writer) createFungibleProposal(m msg.Message) (*proposal, error) {
 	if err != nil {
 		return nil, err
 	}
+	method = strings.Replace(method, "\x00", "", -1)
+
 	call, err := types.NewCall(
 		&meta,
 		method,

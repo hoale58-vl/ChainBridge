@@ -78,7 +78,7 @@ func CreateConfig(key string, chain msg.ChainId, contracts *utils.DeployedContra
 func DeployTestContracts(t *testing.T, client *utils.Client, endpoint string, id msg.ChainId, threshold *big.Int) *utils.DeployedContracts {
 	contracts, err := utils.DeployContracts(
 		client,
-		uint8(id),
+		uint64(id),
 		threshold,
 	)
 	if err != nil {
@@ -138,7 +138,7 @@ func CreateErc20Deposit(t *testing.T, client *utils.Client, destId msg.ChainId, 
 
 	tx, err := bridgeInstance.Deposit(
 		client.Opts,
-		uint8(destId),
+		uint64(destId),
 		rId,
 		data,
 	)
@@ -169,7 +169,7 @@ func CreateErc721Deposit(t *testing.T, client *utils.Client, destId msg.ChainId,
 
 	tx, err := bridgeInstance.Deposit(
 		client.Opts,
-		uint8(destId),
+		uint64(destId),
 		rId,
 		data,
 	)
@@ -199,7 +199,7 @@ func CreateGenericDeposit(t *testing.T, client *utils.Client, destId msg.ChainId
 
 	tx, err := bridgeInstance.Deposit(
 		client.Opts,
-		uint8(destId),
+		uint64(destId),
 		rId,
 		data,
 	)
