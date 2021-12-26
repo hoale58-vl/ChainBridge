@@ -14,6 +14,7 @@ import (
 )
 
 var StoreFunctionSig = CreateFunctionSignature("store(bytes32)")
+var ZeroAddress = common.HexToAddress("0x0000000000000000000000000000000000000000")
 
 // CreateFunctionSignature hashes the function signature and returns the first 4 bytes
 func CreateFunctionSignature(sig string) [4]byte {

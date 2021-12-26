@@ -137,7 +137,7 @@ func InitializeChain(chainCfg *core.ChainConfig, logger log15.Logger, sysErr cha
 		return nil, err
 	}
 
-	chainId, err := bridgeContract.ChainID(conn.CallOpts())
+	chainId, err := bridgeContract.DomainID(conn.CallOpts())
 	if err != nil {
 		return nil, err
 	}

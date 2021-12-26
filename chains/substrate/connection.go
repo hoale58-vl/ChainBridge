@@ -8,30 +8,30 @@ import (
 	"sync"
 
 	utils "github.com/ChainSafe/ChainBridge/shared/substrate"
+	"github.com/ChainSafe/chainbridge-utils/crypto/secp256k1"
 	"github.com/ChainSafe/chainbridge-utils/msg"
 	"github.com/ChainSafe/log15"
 	gsrpc "github.com/centrifuge/go-substrate-rpc-client/v4"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/rpc/author"
-	"github.com/centrifuge/go-substrate-rpc-client/v4/signature"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
 )
 
 type Connection struct {
 	api         *gsrpc.SubstrateAPI
 	log         log15.Logger
-	url         string                 // API endpoint
-	name        string                 // Chain name
-	meta        types.Metadata         // Latest chain metadata
-	metaLock    sync.RWMutex           // Lock metadata for updates, allows concurrent reads
-	genesisHash types.Hash             // Chain genesis hash
-	key         *signature.KeyringPair // Keyring used for signing
-	nonce       types.U32              // Latest account nonce
-	nonceLock   sync.Mutex             // Locks nonce for updates
-	stop        <-chan int             // Signals system shutdown, should be observed in all selects and loops
-	sysErr      chan<- error           // Propagates fatal errors to core
+	url         string             // API endpoint
+	name        string             // Chain name
+	meta        types.Metadata     // Latest chain metadata
+	metaLock    sync.RWMutex       // Lock metadata for updates, allows concurrent reads
+	genesisHash types.Hash         // Chain genesis hash
+	key         *secp256k1.Keypair // Keyring used for signing
+	nonce       types.U32          // Latest account nonce
+	nonceLock   sync.Mutex         // Locks nonce for updates
+	stop        <-chan int         // Signals system shutdown, should be observed in all selects and loops
+	sysErr      chan<- error       // Propagates fatal errors to core
 }
 
-func NewConnection(url string, name string, key *signature.KeyringPair, log log15.Logger, stop <-chan int, sysErr chan<- error) *Connection {
+func NewConnection(url string, name string, key *secp256k1.Keypair, log log15.Logger, stop <-chan int, sysErr chan<- error) *Connection {
 	return &Connection{url: url, name: name, key: key, log: log, stop: stop, sysErr: sysErr}
 }
 
@@ -83,7 +83,7 @@ func (c *Connection) Connect() error {
 // SubmitTx constructs and submits an extrinsic to call the method with the given arguments.
 // All args are passed directly into GSRPC. GSRPC types are recommended to avoid serialization inconsistencies.
 func (c *Connection) SubmitTx(method utils.Method, args ...interface{}) error {
-	c.log.Debug("Submitting substrate call...", "method", method, "sender", c.key.Address)
+	c.log.Debug("Submitting substrate call...", "method", method, "sender", c.key.Address())
 
 	meta := c.getMetadata()
 
@@ -214,7 +214,7 @@ func (c *Connection) checkChainId(expected msg.ChainId) error {
 
 func (c *Connection) getLatestNonce() (types.U32, error) {
 	var acct types.AccountInfo
-	exists, err := c.queryStorage("System", "Account", c.key.PublicKey, nil, &acct)
+	exists, err := c.queryStorage("System", "Account", c.key.CommonAddress().Bytes(), nil, &acct)
 	if err != nil {
 		return 0, err
 	}

@@ -266,7 +266,7 @@ func (w *writer) voteProposal(m msg.Message, dataHash [32]byte) {
 				uint64(m.Source),
 				uint64(m.DepositNonce),
 				m.ResourceId,
-				dataHash,
+				dataHash[:],
 			)
 			w.conn.UnlockOpts()
 
@@ -318,6 +318,7 @@ func (w *writer) executeProposal(m msg.Message, data []byte, dataHash [32]byte) 
 				uint64(m.DepositNonce),
 				data,
 				m.ResourceId,
+				true,
 			)
 			w.conn.UnlockOpts()
 

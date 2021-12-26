@@ -174,6 +174,8 @@ func (l *listener) getDepositEventsForBlock(latestBlock *big.Int) error {
 		destId := msg.ChainId(binary.BigEndian.Uint64(log.Data[24:32]))
 		rId := msg.ResourceIdFromSlice(log.Data[32:64])
 		nonce := msg.Nonce(binary.BigEndian.Uint64(log.Data[88:96]))
+		amount := new(big.Int).SetBytes(log.Data[192:224])
+		recipient := log.Data[256:288]
 
 		addr, err := l.bridgeContract.ResourceIDToHandlerAddress(&bind.CallOpts{From: l.conn.Keypair().CommonAddress()}, rId)
 		if err != nil {
@@ -181,7 +183,7 @@ func (l *listener) getDepositEventsForBlock(latestBlock *big.Int) error {
 		}
 
 		if addr == l.cfg.erc20HandlerContract {
-			m, err = l.handleErc20DepositedEvent(destId, nonce)
+			m, err = l.handleErc20DepositedEvent(destId, nonce, amount, rId, recipient)
 		} else if addr == l.cfg.erc721HandlerContract {
 			m, err = l.handleErc721DepositedEvent(destId, nonce)
 		} else if addr == l.cfg.genericHandlerContract {

@@ -31,7 +31,7 @@ func SubmitTx(client *Client, method Method, args ...interface{}) error {
 	}
 
 	var acct types.AccountInfo
-	_, err = QueryStorage(client, "System", "Account", client.Key.PublicKey, nil, &acct)
+	_, err = QueryStorage(client, "System", "Account", client.Key.CommonAddress().Bytes(), nil, &acct)
 	if err != nil {
 		return err
 	}
@@ -90,7 +90,7 @@ func BatchSubmit(client *Client, calls []types.Call) error {
 	}
 
 	var acct types.AccountInfo
-	_, err = QueryStorage(client, "System", "Account", client.Key.PublicKey, nil, &acct)
+	_, err = QueryStorage(client, "System", "Account", client.Key.CommonAddress().Bytes(), nil, &acct)
 	if err != nil {
 		return err
 	}

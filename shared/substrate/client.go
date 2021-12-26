@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"math/big"
 
+	"github.com/ChainSafe/chainbridge-utils/crypto/secp256k1"
 	"github.com/ChainSafe/chainbridge-utils/msg"
 	"github.com/ChainSafe/log15"
 	gsrpc "github.com/centrifuge/go-substrate-rpc-client/v4"
@@ -20,10 +21,10 @@ type Client struct {
 	Api     *gsrpc.SubstrateAPI
 	Meta    *types.Metadata
 	Genesis types.Hash
-	Key     *signature.KeyringPair
+	Key     *secp256k1.Keypair
 }
 
-func CreateClient(key *signature.KeyringPair, endpoint string) (*Client, error) {
+func CreateClient(key *secp256k1.Keypair, endpoint string) (*Client, error) {
 	c := &Client{Key: key}
 	api, err := gsrpc.NewSubstrateAPI(endpoint)
 	if err != nil {
@@ -62,7 +63,7 @@ func (c *Client) AddRelayer(relayer types.AccountID) error {
 
 func (c *Client) WhitelistChain(id msg.ChainId) error {
 	log15.Info("Whitelisting chain", "chainId", id)
-	return SubmitSudoTx(c, WhitelistChainMethod, types.U8(id))
+	return SubmitSudoTx(c, WhitelistChainMethod, types.U64(id))
 }
 
 func (c *Client) RegisterResource(id msg.ResourceId, method string) error {
@@ -74,17 +75,17 @@ func (c *Client) RegisterResource(id msg.ResourceId, method string) error {
 
 func (c *Client) InitiateNativeTransfer(amount types.U128, recipient []byte, destId msg.ChainId) error {
 	log15.Info("Initiating Substrate native transfer", "amount", amount, "recipient", fmt.Sprintf("%x", recipient), "destId", destId)
-	return SubmitTx(c, ExampleTransferNativeMethod, amount, recipient, types.U8(destId))
+	return SubmitTx(c, ExampleTransferNativeMethod, amount, recipient, types.U64(destId))
 }
 
 func (c *Client) InitiateNonFungibleTransfer(tokenId types.U256, recipient []byte, destId msg.ChainId) error {
 	log15.Info("Initiating Substrate nft transfer", "tokenId", tokenId, "recipient", recipient, "destId", destId)
-	return SubmitTx(c, ExampleTransferErc721Method, recipient, tokenId, types.U8(destId))
+	return SubmitTx(c, ExampleTransferErc721Method, recipient, tokenId, types.U64(destId))
 }
 
 func (c *Client) InitiateHashTransfer(hash types.Hash, destId msg.ChainId) error {
 	log15.Info("Initiating hash transfer", "hash", hash.Hex())
-	return SubmitTx(c, ExampleTransferHashMethod, hash, types.U8(destId))
+	return SubmitTx(c, ExampleTransferHashMethod, hash, types.U64(destId))
 }
 
 // Call creation methods for batching
@@ -126,7 +127,7 @@ func (c *Client) NewRegisterResourceCall(id msg.ResourceId, method string) (type
 }
 
 func (c *Client) NewNativeTransferCall(amount types.U128, recipient []byte, destId msg.ChainId) (types.Call, error) {
-	return types.NewCall(c.Meta, string(ExampleTransferNativeMethod), amount, recipient, types.U8(destId))
+	return types.NewCall(c.Meta, string(ExampleTransferNativeMethod), amount, recipient, types.U64(destId))
 }
 
 // Utility methods
@@ -163,7 +164,7 @@ func (c *Client) OwnerOf(tokenId *big.Int) (types.AccountID, error) {
 
 func (c *Client) GetDepositNonce(chain msg.ChainId) (uint64, error) {
 	var count types.U64
-	chainId, err := types.EncodeToBytes(types.U8(chain))
+	chainId, err := types.EncodeToBytes(types.U64(chain))
 	if err != nil {
 		return 0, err
 	}

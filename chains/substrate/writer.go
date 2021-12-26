@@ -98,6 +98,12 @@ func (w *writer) ResolveMessage(m msg.Message) bool {
 
 func (w *writer) resolveResourceId(id [32]byte) (string, error) {
 	var res []byte
+	// TODO: error while decode parity codec state_storage
+	erc20ResourceId := [32]byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 42}
+	if erc20ResourceId == id {
+		return string("Bridge.transfer"), nil
+	}
+
 	exists, err := w.conn.queryStorage(utils.BridgeStoragePrefix, "Resources", id[:], nil, &res)
 	if err != nil {
 		return "", err
@@ -128,8 +134,8 @@ func (w *writer) proposalValid(prop *proposal) (bool, string, error) {
 	if !exists {
 		return true, "", nil
 	} else if voteRes.Status.IsActive {
-		if containsVote(voteRes.VotesFor, types.NewAccountID(w.conn.key.PublicKey)) ||
-			containsVote(voteRes.VotesAgainst, types.NewAccountID(w.conn.key.PublicKey)) {
+		if containsVote(voteRes.VotesFor, types.NewAccountID(w.conn.key.CommonAddress().Bytes())) ||
+			containsVote(voteRes.VotesAgainst, types.NewAccountID(w.conn.key.CommonAddress().Bytes())) {
 			return false, "already voted", nil
 		} else {
 			return true, "", nil

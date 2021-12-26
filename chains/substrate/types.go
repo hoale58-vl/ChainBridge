@@ -46,7 +46,7 @@ func (m *voteStatus) Decode(decoder scale.Decoder) error {
 type proposal struct {
 	depositNonce types.U64
 	call         types.Call
-	sourceId     types.U8
+	sourceId     types.U64
 	resourceId   types.Bytes32
 	method       string
 }
@@ -92,7 +92,7 @@ func (w *writer) createFungibleProposal(m msg.Message) (*proposal, error) {
 	return &proposal{
 		depositNonce: depositNonce,
 		call:         call,
-		sourceId:     types.U8(m.Source),
+		sourceId:     types.U64(m.Source),
 		resourceId:   types.NewBytes32(m.ResourceId),
 		method:       method,
 	}, nil
@@ -131,7 +131,7 @@ func (w *writer) createNonFungibleProposal(m msg.Message) (*proposal, error) {
 	return &proposal{
 		depositNonce: depositNonce,
 		call:         call,
-		sourceId:     types.U8(m.Source),
+		sourceId:     types.U64(m.Source),
 		resourceId:   types.NewBytes32(m.ResourceId),
 		method:       method,
 	}, nil
@@ -163,7 +163,7 @@ func (w *writer) createGenericProposal(m msg.Message) (*proposal, error) {
 	return &proposal{
 		depositNonce: types.U64(m.DepositNonce),
 		call:         call,
-		sourceId:     types.U8(m.Source),
+		sourceId:     types.U64(m.Source),
 		resourceId:   types.NewBytes32(m.ResourceId),
 		method:       method,
 	}, nil
