@@ -99,9 +99,14 @@ func (w *writer) ResolveMessage(m msg.Message) bool {
 func (w *writer) resolveResourceId(id [32]byte) (string, error) {
 	var res []byte
 	// TODO: error while decode parity codec state_storage
-	erc20ResourceId := [32]byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 42}
+	erc20ResourceId := [32]byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 148, 177, 12, 126, 182, 231, 69, 45, 82, 206, 43, 135, 147, 148, 251, 19}
 	if erc20ResourceId == id {
 		return string("Bridge.transfer"), nil
+	}
+
+	erc721ResourceId := [32]byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 227, 137, 214, 28, 17, 229, 254, 50, 236, 23, 53, 179, 205, 56, 198, 149, 19}
+	if erc721ResourceId == id {
+		return string("Bridge.mint_erc721"), nil
 	}
 
 	exists, err := w.conn.queryStorage(utils.BridgeStoragePrefix, "Resources", id[:], nil, &res)

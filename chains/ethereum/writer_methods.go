@@ -5,6 +5,7 @@ package ethereum
 
 import (
 	"context"
+	"encoding/binary"
 	"errors"
 	"math/big"
 	"time"
@@ -112,7 +113,7 @@ func (w *writer) createErc20Proposal(m msg.Message) bool {
 	// watch for execution event
 	go w.watchThenExecute(m, data, dataHash, latestBlock)
 
-	w.voteProposal(m, dataHash)
+	w.voteProposal(m, data)
 
 	return true
 }
@@ -145,7 +146,7 @@ func (w *writer) createErc721Proposal(m msg.Message) bool {
 	// watch for execution event
 	go w.watchThenExecute(m, data, dataHash, latestBlock)
 
-	w.voteProposal(m, dataHash)
+	w.voteProposal(m, data)
 
 	return true
 }
@@ -180,7 +181,7 @@ func (w *writer) createGenericDepositProposal(m msg.Message) bool {
 	// watch for execution event
 	go w.watchThenExecute(m, data, dataHash, latestBlock)
 
-	w.voteProposal(m, dataHash)
+	w.voteProposal(m, data)
 
 	return true
 }
@@ -221,9 +222,9 @@ func (w *writer) watchThenExecute(m msg.Message, data []byte, dataHash [32]byte,
 
 			// execute the proposal once we find the matching finalized event
 			for _, evt := range evts {
-				sourceId := evt.Topics[1].Big().Uint64()
-				depositNonce := evt.Topics[2].Big().Uint64()
-				status := evt.Topics[3].Big().Uint64()
+				sourceId := binary.BigEndian.Uint64(evt.Data[32-8 : 32])
+				depositNonce := binary.BigEndian.Uint64(evt.Data[64-8 : 64])
+				status := binary.BigEndian.Uint64(evt.Data[96-8 : 96])
 
 				if m.Source == msg.ChainId(sourceId) &&
 					m.DepositNonce.Big().Uint64() == depositNonce &&
@@ -243,7 +244,7 @@ func (w *writer) watchThenExecute(m msg.Message, data []byte, dataHash [32]byte,
 
 // voteProposal submits a vote proposal
 // a vote proposal will try to be submitted up to the TxRetryLimit times
-func (w *writer) voteProposal(m msg.Message, dataHash [32]byte) {
+func (w *writer) voteProposal(m msg.Message, data []byte) {
 	for i := 0; i < TxRetryLimit; i++ {
 		select {
 		case <-w.stop:
@@ -266,7 +267,7 @@ func (w *writer) voteProposal(m msg.Message, dataHash [32]byte) {
 				uint64(m.Source),
 				uint64(m.DepositNonce),
 				m.ResourceId,
-				dataHash[:],
+				data,
 			)
 			w.conn.UnlockOpts()
 
@@ -285,6 +286,7 @@ func (w *writer) voteProposal(m msg.Message, dataHash [32]byte) {
 			}
 
 			// Verify proposal is still open for voting, otherwise no need to retry
+			dataHash := utils.Hash(append(w.cfg.erc721HandlerContract.Bytes(), data...))
 			if w.proposalIsComplete(m.Source, m.DepositNonce, dataHash) {
 				w.log.Info("Proposal voting complete on chain", "src", m.Source, "dst", m.Destination, "nonce", m.DepositNonce)
 				return

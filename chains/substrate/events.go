@@ -35,7 +35,11 @@ func fungibleTransferHandler(evtI interface{}, log log15.Logger) (msg.Message, e
 	}
 
 	resourceId := msg.ResourceId(evt.ResourceId)
-	log.Info("Got fungible transfer event!", "destination", evt.Destination, "resourceId", resourceId.Hex(), "amount", evt.Amount)
+	log.Info("Got fungible transfer event!",
+		"destination", evt.Destination,
+		"resourceId", resourceId.Hex(),
+		"amount", evt.Amount,
+		"nonce", evt.DepositNonce)
 
 	return msg.NewFungibleTransfer(
 		0, // Unset
