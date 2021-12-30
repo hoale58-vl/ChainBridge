@@ -29,23 +29,24 @@ func (l *listener) handleErc20DepositedEvent(
 	), nil
 }
 
-func (l *listener) handleErc721DepositedEvent(destId msg.ChainId, nonce msg.Nonce) (msg.Message, error) {
-	l.log.Info("Handling nonfungible deposit event")
-
-	record, err := l.erc721HandlerContract.GetDepositRecord(&bind.CallOpts{From: l.conn.Keypair().CommonAddress()}, uint64(nonce), uint8(destId))
-	if err != nil {
-		l.log.Error("Error Unpacking ERC721 Deposit Record", "err", err)
-		return msg.Message{}, err
-	}
+func (l *listener) handleErc721DepositedEvent(
+	destId msg.ChainId,
+	nonce msg.Nonce,
+	tokenID *big.Int,
+	resourceId msg.ResourceId,
+	recipient []byte,
+	metadata []byte,
+) (msg.Message, error) {
+	l.log.Info("Handling nonfungible deposit event", "dest", destId, "nonce", nonce)
 
 	return msg.NewNonFungibleTransfer(
 		l.cfg.id,
 		destId,
 		nonce,
-		record.ResourceID,
-		record.TokenID,
-		record.DestinationRecipientAddress,
-		record.MetaData,
+		resourceId,
+		tokenID,
+		recipient,
+		metadata,
 	), nil
 }
 

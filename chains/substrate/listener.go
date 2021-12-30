@@ -196,6 +196,7 @@ func (l *listener) processEvents(hash types.Hash) error {
 	}
 
 	e := utils.Events{}
+
 	err = records.DecodeEventRecords(&meta, &e)
 	if err != nil {
 		return err

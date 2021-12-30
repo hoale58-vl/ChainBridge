@@ -24,7 +24,7 @@ type EventErc721Transferred struct {
 
 type EventErc721Burned struct {
 	Phase   types.Phase
-	TokenId types.AccountID
+	TokenId types.U256
 	Topics  []types.Hash
 }
 

@@ -151,7 +151,7 @@ func InitializeChain(chainCfg *core.ChainConfig, logger log15.Logger, sysErr cha
 		return nil, err
 	}
 
-	erc721HandlerContract, err := erc721Handler.NewERC721Handler(cfg.erc721HandlerContract, conn.Client())
+	erc721HandlerContract, err := erc721Handler.NewContracts(cfg.erc721HandlerContract, conn.Client())
 	if err != nil {
 		return nil, err
 	}

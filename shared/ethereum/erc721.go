@@ -6,7 +6,6 @@ package utils
 import (
 	"math/big"
 
-	"github.com/ChainSafe/ChainBridge/bindings/ERC721Handler"
 	"github.com/ChainSafe/ChainBridge/bindings/ERC721MinterBurnerPauser"
 	"github.com/ethereum/go-ethereum/common"
 )
@@ -73,37 +72,6 @@ func ApproveErc721(client *Client, contractAddress, recipient common.Address, to
 	}
 
 	tx, err := instance.Approve(client.Opts, recipient, tokenId)
-	if err != nil {
-		return err
-	}
-
-	err = WaitForTx(client, tx)
-	if err != nil {
-		return err
-	}
-
-	client.UnlockNonce()
-
-	return nil
-}
-
-func FundErc721Handler(client *Client, handlerAddress, erc721Address common.Address, tokenId *big.Int) error {
-	err := ApproveErc721(client, erc721Address, handlerAddress, tokenId)
-	if err != nil {
-		return err
-	}
-
-	instance, err := ERC721Handler.NewERC721Handler(handlerAddress, client.Client)
-	if err != nil {
-		return err
-	}
-
-	err = client.LockNonceAndUpdate()
-	if err != nil {
-		return err
-	}
-
-	tx, err := instance.FundERC721(client.Opts, erc721Address, client.Opts.From, tokenId)
 	if err != nil {
 		return err
 	}
